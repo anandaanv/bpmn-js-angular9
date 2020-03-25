@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1, 
+  "version": 1,
   "newProjectRoot": "projects",
   "projects": {
     "flooditor": {
@@ -28,7 +28,12 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              'node_modules/bpmn-js/dist/assets/diagram-js.css',
+              'node_modules/bpmn-js/dist/assets/bpmn-font/css/bpmn.css',
+              'node_modules/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css',
+              'node_modules/bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css',
+              'node_modules/bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css'
             ],
             "scripts": []
           },
@@ -66,6 +71,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
+            "port": 4100,
             "browserTarget": "flooditor:build"
           },
           "configurations": {
@@ -123,6 +129,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "flooditor"
+    }
+  },
+  "defaultProject": "flooditor",
+  "cli": {
+    "analytics": "2723fd6b-be16-4061-9aea-859b864b7231"
+  }
 }

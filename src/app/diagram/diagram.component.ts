@@ -11,6 +11,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 
+
 import { HttpClient } from '@angular/common/http';
 
 /**
@@ -28,11 +29,15 @@ import { importDiagram } from './rx';
 import { throwError } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 
+import BpmnPalletteModule from 'bpmn-js/lib/features/palette';
+
+
 @Component({
   selector: 'app-diagram',
   templateUrl: './diagram.component.html',
   styleUrls: ['./diagram.component.scss']
 })
+
 export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges {
 
   // instantiate BpmnJS with component
@@ -69,7 +74,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges 
 
   loadUrl(url: string) {
     return (
-      this.http.get(url, { responseType: 'text' }).pipe(
+      this.http.get('http://localhost:8080/bpmn/get-process-definition/tenant1', { responseType: 'text' }).pipe(
         catchError(err => throwError(err)),
         importDiagram(this.viewer)
       ).subscribe(
@@ -87,5 +92,21 @@ export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges 
         }
       )
     );
+  }
+
+
+  save() {
+    this.viewer.saveXML((err: any, xml: any) => {
+      console.log(err);
+      console.log(xml);
+      const data = {
+        tenantId: 'tenant1',
+        bpmnXml: xml
+      };
+      this.http.post('http://localhost:8080/bpmn/deploy', null, {params: data})
+        .subscribe((response) => {
+          console.log(response);
+        });
+    });
   }
 }

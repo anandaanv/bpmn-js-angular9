@@ -23,6 +23,8 @@ import { HttpClient } from '@angular/common/http';
  */
 // import * as BpmnJS from 'bpmn-js/dist/bpmn-navigated-viewer.development.js';
 import * as BpmnJS from 'bpmn-js/dist/bpmn-modeler.production.min.js';
+import propertiesPanelModule from 'bpmn-js-properties-panel';
+import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/camunda';
 
 import { importDiagram } from './rx';
 
@@ -38,10 +40,10 @@ import BpmnPalletteModule from 'bpmn-js/lib/features/palette';
   styleUrls: ['./diagram.component.scss']
 })
 
-export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges {
+export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   // instantiate BpmnJS with component
-  private viewer: BpmnJS = new BpmnJS();
+  private viewer: BpmnJS;
 
   // retrieve DOM element reference
   @ViewChild('ref', {static: true}) private el: ElementRef;
@@ -57,6 +59,17 @@ export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges 
   ngAfterContentInit(): void {
     console.log(this.el);
     // attach BpmnJS instance to DOM element
+    this.viewer = new BpmnJS(
+      {
+        propertiesPanel: {
+          parent: '#js-properties-panel'
+        },
+        additionalModules: [
+          propertiesPanelModule,
+          propertiesProviderModule
+        ]
+      });
+    this.loadUrl(this.url);
     this.viewer.attachTo(this.el.nativeElement);
   }
 
@@ -65,16 +78,16 @@ export class DiagramComponent implements AfterContentInit, OnDestroy, OnChanges 
     this.viewer.destroy();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    // re-import whenever the url changes
-    if (changes.url) {
-      this.loadUrl(changes.url.currentValue);
-    }
-  }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   // re-import whenever the url changes
+  //   if (changes.url) {
+  //     this.loadUrl(changes.url.currentValue);
+  //   }
+  // }
 
   loadUrl(url: string) {
     return (
-      this.http.get('http://localhost:8080/bpmn/get-process-definition/tenant1', { responseType: 'text' }).pipe(
+      this.http.get(url, { responseType: 'text' }).pipe(
         catchError(err => throwError(err)),
         importDiagram(this.viewer)
       ).subscribe(
